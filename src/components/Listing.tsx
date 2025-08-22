@@ -1,11 +1,13 @@
 import React from "react";
-import { Item, ListingProps } from "./types";
+import { Item, ListingProps, RawItem } from "./types";
 import { ItemCard } from "./ItemCard";
 
 const Listing: React.FC<ListingProps> = ({ items = [] }) => {
-  const safeItems = (items as any[]).filter((item) => {
+  // Type guard для проверки, является ли элемент валидным Item
+  const isValidItem = (item: RawItem): item is Item => {
     return (
       item &&
+      item.state &&
       item.state === "active" &&
       item.url &&
       item.MainImage &&
@@ -15,7 +17,10 @@ const Listing: React.FC<ListingProps> = ({ items = [] }) => {
       item.price &&
       typeof item.quantity === "number"
     );
-  }) as Item[];
+  };
+
+  // Фильтруем сырые данные (RawItem[]) в валидные (Item[])
+  const safeItems = items.filter(isValidItem);
 
   return (
     <div className="item-list">

@@ -1,69 +1,82 @@
-# React + TypeScript + Vite
+# Etsy Listing - React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Проект для отображения списка товаров Etsy с использованием React, TypeScript и Vite.
 
-Currently, two official plugins are available:
+## Описание
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Это приложение отображает список товаров из Etsy API, фильтруя только активные товары с необходимыми полями.
 
-## Expanding the ESLint configuration
+## Особенности
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **TypeScript**: Полная типизация без использования `any` или `as`
+- **Type Guards**: Использование type guards для безопасной фильтрации данных
+- **React 19**: Современная версия React с хуками
+- **Vite**: Быстрый сборщик для разработки
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Структура проекта
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/
+│   ├── ItemCard.tsx      # Компонент карточки товара
+│   ├── Listing.tsx       # Компонент списка товаров
+│   └── types.ts          # TypeScript типы
+├── data/
+│   └── etsy.json         # Данные товаров Etsy
+└── App.tsx               # Главный компонент
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Исправления типизации
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Проблема
+В исходном коде использовались:
+- `any` для типизации массива
+- `as` для приведения типов
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Решение
+1. **Создан интерфейс `RawItem`** для сырых данных из API
+2. **Расширен интерфейс `Item`** для валидных данных
+3. **Реализован type guard `isValidItem`** для безопасной фильтрации
+4. **Убраны все использования `any` и `as`**
+
+### Пример исправленного кода
+
+```typescript
+// Type guard для проверки валидности элемента
+const isValidItem = (item: RawItem): item is Item => {
+  return (
+    item &&
+    item.state === "active" &&
+    item.url &&
+    item.MainImage &&
+    item.MainImage.url_570xN &&
+    item.title &&
+    item.currency_code &&
+    item.price &&
+    typeof item.quantity === "number"
+  );
+};
+
+// Типизированная фильтрация
+const safeItems = items.filter(isValidItem);
 ```
+
+## Запуск проекта
+
+```bash
+# Установка зависимостей
+npm install
+
+# Запуск в режиме разработки
+npm run dev
+
+# Сборка проекта
+npm run build
+```
+
+## Технологии
+
+- React 19.1.1
+- TypeScript 5.8.3
+- Vite 7.1.2
+- ESLint 9.33.0

@@ -4,8 +4,9 @@ export interface MainImage {
 
 export interface Item {
   listing_id: number;
+  state: string;
   url: string;
-  MainImage: MainImage;
+  MainImage?: MainImage;
   title: string;
   currency_code: string;
   price: string;
@@ -13,5 +14,18 @@ export interface Item {
 }
 
 export interface ListingProps {
-  items?: Item[];
+  items?: RawItem[];
+}
+
+export interface RawItem {
+  listing_id: number;
+  state: string;
+  url: string;
+  MainImage?: {
+    url_570xN: string;
+  };
+  title: string;
+  currency_code: string;
+  price: string;
+  quantity: number;
 }
